@@ -36,6 +36,11 @@ def second_dataset():
 
     print("10-fold cross validation is {}".format(kfold_validation(z,data_Y,10)))
 
+    for degree in range(1,20):
+        poly = preprocessing.PolynomialFeatures(degree)
+        newx = poly.fit_transform(data_X)
+        print("degree: {}, 10-fold cross valdiation: {}".format(degree,kfold_validation(newx,data_Y,10)))
+
     #plt.scatter(data_X_test[:,1], data_Y_test,  color='black')
     #plt.plot(data_X_test[:,1], predict(thetas,data_X_test), color='blue',linewidth=3)
 
