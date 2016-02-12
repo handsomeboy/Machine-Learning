@@ -2,6 +2,8 @@
 import numpy as np
 import numpy.linalg as la
 from sklearn.cross_validation import KFold
+from sklearn import preprocessing
+import random
 
 def predict(coef,x):
     return np.dot(x,coef)
@@ -43,3 +45,25 @@ def kfold_validation(data_x,data_y,k):
         thetas = fit_model1(x_train, y_train)
         all_errors.append(getMeanError(thetas,x_test,y_test))
     return np.mean(all_errors)
+
+def mapFeatures(x, degree):
+    poly = preprocessing.PolynomialFeatures(degree)
+    return poly.fit_transform(x)
+
+def gradient_descent(x,y, threshold=0.0000001, maxIterations=100000, delta=9999, learning_weight=0.0000001 ):
+    #iterative solution
+    iterations = 0
+    thetas = []
+    #random start
+    for i in range(len(x[0])):
+        thetas.append(random.random())
+    while (delta > threshold and iterations < maxIterations):
+        predictions = np.dot(x,thetas)
+        errors = predictions - y
+        squared_errors = np.dot(np.transpose(x), errors)
+        aux1 = np.dot(learning_weight,squared_errors)
+        new_thetas = thetas - aux1
+        delta = getMeanError(thetas,x,y) - getMeanError(new_thetas,x,y)
+        iterations += 1
+        thetas = new_thetas
+    return thetas
