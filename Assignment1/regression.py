@@ -4,6 +4,8 @@ import numpy.linalg as la
 from sklearn.cross_validation import KFold
 from sklearn import preprocessing
 import random
+from scipy.spatial.distance import pdist, squareform
+import scipy
 
 def predict(coef,x):
     return np.dot(x,coef)
@@ -66,4 +68,16 @@ def gradient_descent(x,y, threshold=0.0000001, maxIterations=100000, delta=9999,
         delta = getMeanError(thetas,x,y) - getMeanError(new_thetas,x,y)
         iterations += 1
         thetas = new_thetas
+    return thetas
+
+def getGramMatrix(x):
+    return squareform(pdist(x, 'euclidean'))
+
+def getGaussianGramMatrix(x,s):
+    gram = getGramMatrix(x)
+    return scipy.exp(-gram**2 / 2*(s**2))
+
+def solveDual(gram_matrix, x, y):
+    alfas = np.dot(la.inv(gram_matrix),y)
+    thetas = np.dot(np.transpose(x),alfas)
     return thetas
