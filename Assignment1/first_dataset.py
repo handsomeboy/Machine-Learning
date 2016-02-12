@@ -29,7 +29,7 @@ def main():
     thetas = fit_model2(data_X_train, data_Y_train)
     print("Method 2 Coefficients: {}\n".format(thetas))
 
-    thetas = gradient_descent(data_X_train,data_Y_train,learning_weight=0.000000001)
+    thetas = gradient_descent(data_X_train,data_Y_train,learning_weight=0.001)
     print("Itearative Method Coefficients: {}\n".format(thetas))
 
     #calculate thetas method 3

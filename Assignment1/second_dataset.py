@@ -34,12 +34,12 @@ def second_dataset():
     print("Training Mean Squared Error: {}\n".format(getMeanError(thetas,data_X_train,data_Y_train)))
     print("Testing Mean Squared Error: {}\n".format(getMeanError(thetas,data_X_test,data_Y_test)))
 
-    print("10-fold cross validation is {}".format(kfold_validation(z,data_Y,10)))
+    print("10-fold cross validation is {}".format(kfold_validation(z,data_Y,10, fit_model1)))
 
-    for degree in range(1,20):
+    for degree in range(1,30):
         poly = preprocessing.PolynomialFeatures(degree)
         newx = poly.fit_transform(data_X)
-        print("degree: {}, 10-fold cross valdiation: {}".format(degree,kfold_validation(newx,data_Y,10)))
+        print("degree: {}, 10-fold cross valdiation: {}".format(degree,kfold_validation(newx,data_Y,10, fit_model1)))
 
     #plt.scatter(data_X_test[:,1], data_Y_test,  color='black')
     #plt.plot(data_X_test[:,1], predict(thetas,data_X_test), color='blue',linewidth=3)
