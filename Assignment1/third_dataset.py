@@ -12,7 +12,32 @@ def third_dataset():
 
     #plot original data
     plt.scatter(data_X, data_Y,  color='black')
+    plt.xlabel('x')
+    plt.ylabel('y')
     plt.show()
+
+    for degree in range(1,4):
+        #map features
+        z=mapFeatures(data_X,degree)
+        # Split the data into training/testing sets
+        data_X_train, data_Y_train, data_X_test, data_Y_test = splitDataSet(0.9,z,data_Y)
+
+        #calculate thetas method 1
+        thetas = fit_model1(data_X_train, data_Y_train)
+        print("Method 1 Coefficients: {}\n".format(thetas))
+
+
+        plt.scatter(data_X_train[:,1], predict(thetas,data_X_train), color='green',
+                 linewidth=3)
+
+        plt.scatter(data_X_test[:,1], data_Y_test,  color='black')
+        plt.scatter(data_X_test[:,1], predict(thetas,data_X_test), color='blue',
+                 linewidth=3)
+        plt.xlabel('x')
+        plt.ylabel("y")
+        plt.show()
+
+#--------------------------------------------------------------------#
 
     for degree in range(1,50):
         poly = preprocessing.PolynomialFeatures(degree)

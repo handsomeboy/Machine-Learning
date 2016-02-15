@@ -11,8 +11,10 @@ def second_dataset():
     data_X, data_Y = readData("data/svar-set2.dat", " ")
 
     #plot original data
-    #plt.scatter(data_X, data_Y,  color='black')
-    #plt.show()
+    plt.scatter(data_X, data_Y,  color='black')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.show()
 
     #add ones to first column in X
     poly = preprocessing.PolynomialFeatures(1)
