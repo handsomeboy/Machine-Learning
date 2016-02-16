@@ -100,7 +100,7 @@ def getGramMatrix(x):
 
 def getGaussianGramMatrix(x,s):
     gram = getGramMatrix(x)
-    return scipy.exp(-gram**2 / 2*(s**2))
+    return scipy.exp(-gram**2 / (2*(s**2)))
 
 def solveDual(gram_matrix, x, y):
     alfas = np.dot(la.inv(gram_matrix),y)
