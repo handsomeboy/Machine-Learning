@@ -23,7 +23,7 @@ def third_dataset():
         data_X_train, data_Y_train, data_X_test, data_Y_test = splitDataSet(0.9,z,data_Y)
 
         #calculate thetas method 1
-        thetas = fit_model1(data_X_train, data_Y_train)
+        thetas = fit_model(data_X_train, data_Y_train)
         print("Method 1 Coefficients: {}\n".format(thetas))
 
 

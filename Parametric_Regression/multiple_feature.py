@@ -12,7 +12,7 @@ def mulitple_features_dataset():
 
     #compare results of regression methods
     z = mapFeatures(data_X,1)
-    thetas = fit_model1(z, data_Y)
+    thetas = fit_model(z, data_Y)
     print("Method 1 Coefficients: {}\n".format(thetas))
     regr = linear_model.LinearRegression()
     regr.fit(z, data_Y)

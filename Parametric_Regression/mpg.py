@@ -62,7 +62,7 @@ def housing():
         #map features
         newx = mapFeatures(X_scaled,degree)
         print(newx.shape)
-        performance = kfold_validation(newx,data_Y,10, fit_model1)
+        performance = kfold_validation(newx,data_Y,10, fit_model)
         values[degree-1] = [degree,performance]
         print("degree: {}, 10-fold cross valdiation: {}".format(degree,performance))
     plt.plot(values[:,np.newaxis,0],values[:,np.newaxis,1])
@@ -75,9 +75,9 @@ def housing():
     newx = mapFeatures(X_scaled,2)
     for k in range(2,10,1):
         #map features
-        performance = kfold_validation(newx,data_Y,k, fit_model1)
+        performance = kfold_validation(newx,data_Y,k, fit_model)
         values[k-2] = [int(k),performance]
-        print("degree: {}, 10-fold cross valdiation: {}".format(degree,kfold_validation(newx,data_Y,10, fit_model1)))
+        print("degree: {}, 10-fold cross valdiation: {}".format(degree,kfold_validation(newx,data_Y,10, fit_model)))
     plt.xlabel('K Folds')
     plt.ylabel('Mean testing error')
     plt.bar(values[:,np.newaxis,0],values[:,np.newaxis,1])

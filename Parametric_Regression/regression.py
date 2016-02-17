@@ -30,13 +30,10 @@ def splitDataSet(trainingProp, x, y):
     testing_y = y[-(m - training_size):]
     return (training_x,training_y, testing_x,testing_y)
 
-def fit_model1(data_X_train, data_Y_train):
+def fit_model(data_X_train, data_Y_train):
     return np.dot(np.linalg.pinv(data_X_train),data_Y_train)
 
-def fit_model2(data_X_train, data_Y_train):
-    return np.dot(np.dot(la.inv(np.dot(np.transpose(data_X_train),data_X_train)), np.transpose(data_X_train)),data_Y_train)
-
-def kfold_validation(data_x,data_y, k, function=fit_model1):
+def kfold_validation(data_x,data_y, k, function=fit_model):
     kf = KFold(len(data_x), n_folds=k)
     all_errors = list()
     for train_index, test_index in kf:
@@ -77,13 +74,15 @@ def mapFeatures(x, degree):
     poly = preprocessing.PolynomialFeatures(degree)
     return poly.fit_transform(x)
 
-def gradient_descent(x,y, threshold=0.0000001, maxIterations=100000, delta=9999, learning_weight=0.0000001 ):
+def gradient_descent(x,y, threshold=0.000001, maxIterations=100000, delta=9999, learning_weight=0.0000001 ):
     #iterative solution
     iterations = 0
     thetas = []
     #random start
     for i in range(len(x[0])):
         thetas.append(random.random())
+    all_errors = np.empty([0,2])
+    all_errors = np.append(all_errors,[[0,getMeanError(thetas,x,y)]],axis=0)
     while (delta > threshold and iterations < maxIterations):
         predictions = np.dot(x,thetas)
         errors = predictions - y
@@ -92,8 +91,10 @@ def gradient_descent(x,y, threshold=0.0000001, maxIterations=100000, delta=9999,
         new_thetas = thetas - aux1
         delta = getMeanError(thetas,x,y) - getMeanError(new_thetas,x,y)
         iterations += 1
+        all_errors = np.append(all_errors,[[iterations,getMeanError(new_thetas,x,y)]],axis=0)
         thetas = new_thetas
-    return (thetas,iterations)
+
+    return (thetas,iterations,all_errors)
 
 def getGramMatrix(x):
     return squareform(pdist(x, 'euclidean'))
