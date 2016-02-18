@@ -45,7 +45,7 @@ def kfold_validation(data_x,data_y, k, function=fit_model):
         all_errors.append(getMeanError(thetas,x_test,y_test))
     return np.mean(all_errors)
 
-def kfold_validation_gradient_descent(data_x,data_y, k, lw):
+def kfold_validation_gradient_descent(data_x,data_y, k, lw,threshold=0.00001):
     kf = KFold(len(data_x), n_folds=k)
     all_errors = list()
     for train_index, test_index in kf:
@@ -53,7 +53,7 @@ def kfold_validation_gradient_descent(data_x,data_y, k, lw):
         y_train = data_y[train_index]
         x_test = data_x[test_index]
         y_test = data_y[test_index]
-        thetas,iterations = gradient_descent(x_train, y_train,lw)
+        thetas,iterations,errors = gradient_descent(x_train, y_train, learning_weight=lw,threshold=threshold)
         all_errors.append(getMeanError(thetas,x_test,y_test))
     return np.mean(all_errors)
 
