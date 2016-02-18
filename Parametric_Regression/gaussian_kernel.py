@@ -13,12 +13,11 @@ import scipy
 def gaussian_kernel():
 
     data_X, data_Y = readData("data/housing/housing.data")
-
     #compare results of regression methods
     z = mapFeatures(data_X,1)
     z = z[1:150,:]
     data_Y = data_Y[1:150]
-    thetas = fit_model1(z, data_Y)
+    thetas = fit_model(z, data_Y)
     print("Method 1 Coefficients: {}".format(thetas))
     print("10-fold performance: {}\n".format(kfold_validation(z,data_Y,10)))
 
