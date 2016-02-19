@@ -7,16 +7,20 @@ import random
 from scipy.spatial.distance import pdist, squareform
 import scipy
 
+#predict an example x using the thetas coef
 def predict(coef,x):
     return np.dot(x,coef)
 
+#get the sum of squared errors
 def getError(coef, z, y):
     aux = np.transpose(np.dot(z,coef) - y)
     return np.dot(aux,np.dot(z,coef) - y)
 
+#get the mean squared error
 def getMeanError(coef, z, y):
     return getError(coef,z,y) / len(z)
 
+#add ones to first column
 def createZMatrix(x):
     return  np.append(np.ones((len(x),1)),x,1)
 
@@ -30,9 +34,11 @@ def splitDataSet(trainingProp, x, y):
     testing_y = y[-(m - training_size):]
     return (training_x,training_y, testing_x,testing_y)
 
+#fit the model using explicit solution
 def fit_model(data_X_train, data_Y_train):
     return np.dot(np.linalg.pinv(data_X_train),data_Y_train)
 
+#evaluate using k-fold cross validation
 def kfold_validation(data_x,data_y, k, function=fit_model):
     kf = KFold(len(data_x), n_folds=k)
     all_errors = list()
@@ -45,6 +51,7 @@ def kfold_validation(data_x,data_y, k, function=fit_model):
         all_errors.append(getMeanError(thetas,x_test,y_test))
     return np.mean(all_errors)
 
+#evalutae k-fold cross validation for the gradient descent algorithm
 def kfold_validation_gradient_descent(data_x,data_y, k, lw,threshold=0.00001):
     kf = KFold(len(data_x), n_folds=k)
     all_errors = list()
@@ -57,7 +64,8 @@ def kfold_validation_gradient_descent(data_x,data_y, k, lw,threshold=0.00001):
         all_errors.append(getMeanError(thetas,x_test,y_test))
     return np.mean(all_errors)
 
-def kfold_validation_gaussian(data_x,data_y, k, s):
+#evalutae k-fold cross validation for the dual regression
+def kfold_validation_dual(data_x,data_y, k, s):
     kf = KFold(len(data_x), n_folds=k)
     all_errors = list()
     for train_index, test_index in kf:
@@ -65,15 +73,16 @@ def kfold_validation_gaussian(data_x,data_y, k, s):
         y_train = data_y[train_index]
         x_test = data_x[test_index]
         y_test = data_y[test_index]
-        gram_matrix = getGaussianGramMatrix(x_train,s)
-        thetas = solveDual(gram_matrix, x_train, y_train)
-        all_errors.append(getMeanError(thetas,x_test,y_test))
+        alphas = solveDual(x_train,y_train,s)
+        all_errors.append(getMeanErrorDual(alphas,x_train,x_test,y_test,s))
     return np.mean(all_errors)
 
+#map matrix to a higher polynomial degree
 def mapFeatures(x, degree):
     poly = preprocessing.PolynomialFeatures(degree)
     return poly.fit_transform(x)
 
+#gradient descent algorithm
 def gradient_descent(x,y, threshold=0.000001, maxIterations=100000, delta=9999, learning_weight=0.0000001 ):
     #iterative solution
     iterations = 0
@@ -103,7 +112,30 @@ def getGaussianGramMatrix(x,s):
     gram = getGramMatrix(x)
     return scipy.exp(-(gram**2) / (2*(s**2)))
 
-def solveDual(gram_matrix, x, y):
-    alfas = np.dot(la.inv(gram_matrix),y)
-    thetas = np.dot(np.transpose(x),alfas)
-    return thetas
+#solve dual regression with gaussian kernel function
+def solveDual(z, y, s):
+    alfas = alphas = np.dot(la.inv(getGaussianGramMatrix(z,s)),y)
+    return alphas
+
+#predict an example for dual regression
+def predictDual(z,alphas,example,s):
+    sum = 0
+    for i in range(0,len(alphas)):
+        values = np.array([example,z[i]])
+        dist = pdist(values,'euclidean')
+        gaussian = scipy.exp(-(dist**2)/(2*(s**2)))
+        sum += alphas[i] * gaussian
+    return sum
+
+
+#get the sum of squared errors for dual regression
+def getErrorDual(alphas, x, z, y,s):
+    sum = 0
+    for i in range(0,len(z)):
+        aux = predictDual(x,alphas,z[i],s)
+        sum += (aux - y[i])**2
+    return sum
+
+#get the mean squared error for dual regression
+def getMeanErrorDual(alphas, x, z, y,s):
+    return getErrorDual(alphas,x, z,y,s) / len(z)

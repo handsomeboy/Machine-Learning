@@ -9,31 +9,32 @@ from data_utils import *
 from regression import *
 from scipy.spatial.distance import pdist, squareform
 import scipy
+import math
+def main():
 
-def gaussian_kernel():
+    #read data
+    data_X, data_Y = readData("data/housing/housing.data", scale=True)
 
-    data_X, data_Y = readData("data/housing/housing.data")
-    #compare results of regression methods
+    #add 1's in first column
     z = mapFeatures(data_X,1)
-    z = z[1:150,:]
-    data_Y = data_Y[1:150]
-    thetas = fit_model(z, data_Y)
-    print("Method 1 Coefficients: {}".format(thetas))
-    print("10-fold performance: {}\n".format(kfold_validation(z,data_Y,10)))
 
-    regr = linear_model.LinearRegression()
-    regr.fit(z, data_Y)
-    print("Ready Made method Coefficients: {} Intercept: {}\n".format(regr.coef_, regr.intercept_))
+    #compute alphas
+    alphas = solveDual(z,data_Y,1)
 
-    #solve dual
-    thetas = solveDual(getGaussianGramMatrix(z,5), z, data_Y)
-    print("Dual Problem - Gaussian Kernel Coefficients: {}".format(thetas))
-    print("10-fold performance: {}\n".format(kfold_validation_gaussian(z,data_Y,10,5)))
+    #obtain prediction for an example of the training set
+    example = z[3]
+    print("predicted: {}".format(predictDual(z,alphas,example,1)))
+    print("real: {}".format(data_Y[3]))
 
-    #predict with dual
-    example = z[1]
-    print("prediction: {}".format(predict(thetas, z[1])))
-    print(data_Y[1])
-
+    #evaluate with 10 fold cross validation
+    values = np.empty([7,2])
+    for sigma in range(1,8):
+        performance = kfold_validation_dual(z,data_Y,10,sigma)
+        print("10-fold cross validation mean squared error for sigma = {} is {}\n".format(sigma, performance))
+        values[sigma-1] = [int(sigma),performance]
+    plt.xlabel('Sigma')
+    plt.ylabel('Mean Squared Error (10 Fold Cross Validation')
+    plt.plot(values[:,np.newaxis,0],values[:,np.newaxis,1])
+    plt.show()
 if __name__ == "__main__":
-    gaussian_kernel()
+    main()
