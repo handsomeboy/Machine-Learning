@@ -22,6 +22,9 @@ def getMembership(x, data, labels, label):
         membership = (- math.log(math.sqrt(cov))) + mahalaobis_distance + prior
     return membership
 
+def discriminative(x,data,labels):
+    return getMembership(x,data,labels,1) - getMembership(x,data,labels,0)
+
 def classify(x,data, labels):
     maxMembership = None
     maxLabel = None

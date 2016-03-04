@@ -19,22 +19,11 @@ def main():
     x = x[p]
     y = y[p]
 
-    x = x[:,(0,1)]
     # encode class labels
     classes, y = np.unique(y, return_inverse=True)
 
     print("Training accuracy: {}".format(getAccuracy(y,classifyAll(x,x,y),1)))
     print("Kfold Accuracy, recall, precission,tp,tn,fp,fn: {}".format(kfoldCrossValidation(x,y, 10, 1)))
-
-    # plot data and decision surface
-    ax = plt.gca()
-    cm_bright = ListedColormap(['#FF0000', '#0000FF'])
-    ax.scatter(x[:,0], x[:,1], c=(y == 1), cmap=cm_bright)
-
-    pu.plot_surface(x,y, x[:, 0], x[:, 1], ax=ax)
-    plt.show()
-
-
 
 if __name__ == "__main__":
     main()
