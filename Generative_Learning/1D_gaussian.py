@@ -20,7 +20,7 @@ def main():
     x = x[:,np.newaxis,0]
 
     print("Training accuracy: {}".format(getAccuracy(labels,classifyAll(x,x,labels),1)))
-    print("Kfold Accuracy, recall, precission,tp,tn,fp,fn: {}".format(kfoldCrossValidation(x,labels, 10, 1)))
+    print("Kfold Accuracy, recall, precission,tp,tn,fp,fn, fmeasure: {}".format(kfoldCrossValidation(x,labels, 10, 1)))
 
     #find parameters
     c0_examples = x[np.ix_(labels == 0.0)]
