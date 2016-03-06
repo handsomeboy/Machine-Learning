@@ -6,6 +6,7 @@ from generative_learning import *
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
+from metrics import *
 
 def main():
     #read data
@@ -31,10 +32,14 @@ def main():
     ax=fig.add_subplot(111)
     colors = ['red','green']
     #plot in the same line
-    # ax.scatter(x, np.ones(x.shape[0]), c=labels, lw=0,cmap=matplotlib.colors.ListedColormap(colors))
+
     #plot in different lines
     ax.scatter(c0_examples, np.ones(c0_examples.shape[0]), c=labels[np.ix_(labels == 0.0)], lw=0,cmap=matplotlib.colors.ListedColormap(colors))
+    colors = ['green','red']
+
     ax.scatter(c1_examples, np.zeros(c1_examples.shape[0]), c=labels[np.ix_(labels == 1)], lw=0,cmap=matplotlib.colors.ListedColormap(colors))
+    ax.yaxis.set_visible(False)
+    plt.xlabel('X')
     plt.show()
 
     #predict and plot
@@ -45,6 +50,8 @@ def main():
     ax=fig.add_subplot(111)
     colors = ['red','green']
     ax.scatter(x, np.ones(x.shape[0]), c=predictedLabels, lw=0,cmap=matplotlib.colors.ListedColormap(colors))
+    ax.yaxis.set_visible(False)
+    plt.xlabel('X')
     plt.show()
 
 if __name__ == "__main__":
