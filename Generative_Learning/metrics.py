@@ -9,6 +9,13 @@ def getTP(labels, predictedLabels, class_label):
             sum += 1
     return sum
 
+def getN(labels,predictedLabels, c1,c2):
+    sum = 0
+    for i in range(0,labels.shape[0]):
+        if(labels[i] == c2 and predictedLabels[i] ==  c2):
+            sum += 1
+    return sum
+
 def getTN(labels, predictedLabels, class_label):
     sum = 0
     for i in range(0,labels.shape[0]):
@@ -75,6 +82,8 @@ def getPrecision(labels,predictedLabels, positive_label):
 def getFMeasure(labels,predictedLabels, positive_label):
     precision = getPrecision(labels,predictedLabels, positive_label)
     recall = getRecall(labels,predictedLabels, positive_label)
+    if((precision*recall) == 0):
+        return 0
     fmeasure = (2*(precision*recall))/(precision+recall)
     print ("Built-in fmeasure = {}".format(metrics.f1_score(labels, predictedLabels)))
     print ("fmeasure = {}".format(fmeasure))

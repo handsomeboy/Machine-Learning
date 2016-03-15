@@ -1,6 +1,6 @@
 from data_utils import *
 import numpy as np
-from generative_learning import *
+from gda import *
 from sklearn import metrics
 
 def main():
@@ -21,6 +21,7 @@ def main():
     cm = metrics.confusion_matrix(y,classifyAll(x,x,y))
     accuracy = metrics.accuracy_score(y,classifyAll(x,x,y))
     precision = metrics.precision_score(y,classifyAll(x,x,y))
-    cm.shape
+    print("Kfold Accuracy, recall, precission,tp,tn,fp,fn: {}".format(kfoldCrossValidation3Classes(x,y, 10, 2)))
+
 if __name__ == "__main__":
     main()

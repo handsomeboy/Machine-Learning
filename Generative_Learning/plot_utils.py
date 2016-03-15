@@ -2,13 +2,13 @@
 
 from data_utils import *
 import numpy as np
-from generative_learning import *
+from gda import *
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
 import matplotlib.mlab as mlab
 import scipy.stats as stats
-import generative_learning
+import gda
 from matplotlib.colors import ListedColormap
 
 def plot_surface(data_X,data_Y, x_1, x_2, ax=None, threshold=0.0, contourf=False):
@@ -33,25 +33,3 @@ def plot_surface(data_X,data_Y, x_1, x_2, ax=None, threshold=0.0, contourf=False
     ax.contour(xx1, xx2, Z, levels=[threshold], colors='black')
     ax.set_xlim((x_1.min(), x_1.max()))
     ax.set_ylim((x_2.min(), x_2.max()))
-
-def main():
-    from sklearn.linear_model import LinearRegression
-
-    x, y = readData("C:/Users/marro/Repo/CS584/Generative_Learning/Data/banknote/data_banknote_authentication.txt",",",scale=False)
-
-    x = x[:,(0,1)]
-    # encode class labels
-    classes, y = np.unique(y, return_inverse=True)
-    # y = (y * 2) - 1  # map {0, 1} to {-1, 1}
-
-    # fit OLS regression
-    est = LinearRegression(fit_intercept=True, normalize=True)
-    est.fit(x, y)
-
-    # plot data and decision surface
-    ax = plt.gca()
-    cm_bright = ListedColormap(['#FF0000', '#0000FF'])
-    ax.scatter(x[:,0], x[:,1], c=(y == 1), cmap=cm_bright)
-
-    plot_surface(x,y, x[:, 0], x[:, 1], ax=ax)
-    plt.show()

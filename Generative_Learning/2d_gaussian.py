@@ -2,7 +2,7 @@
 
 from data_utils import *
 import numpy as np
-from generative_learning import *
+from gda import *
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
@@ -51,7 +51,8 @@ def main():
     ax = plt.gca()
     cm_bright = ListedColormap(['#FF0000', '#0000FF'])
     ax.scatter(x[:,0], x[:,1], c=(y == 1), cmap=cm_bright)
-
+    plt.xlabel("X1")
+    plt.ylabel("X2")
     pu.plot_surface(x,y, x[:, 0], x[:, 1], ax=ax)
     plt.show()
 

@@ -8,11 +8,20 @@ from scipy.stats._continuous_distns import maxwell_gen
 from sklearn import metrics
 from sklearn.cross_validation import KFold
 from math import factorial
+from metrics import *
 
 def getMembership(x,class_mean, prior):
     sum = 0
     for j in range(0,len(class_mean)):
-        sum += x[j]*math.log(class_mean[j]) + (1-x[j]) * math.log(1 - class_mean[j])
+        if(class_mean[j] == 0):
+            aux = 0
+        else:
+            aux = math.log(class_mean[j])
+        if( class_mean[j] == 1):
+            aux2 = 0
+        else:
+            aux2 = math.log(1 - class_mean[j])
+        sum += x[j]*aux + (1-x[j]) * aux2
     sum += math.log(prior)
     return sum
 
@@ -64,9 +73,14 @@ def classify_binomial(x, data, counts, y):
             max_label = class_label
             max = membership
         else:
-            if membership>max:
-                max = membership
-                max_label = class_label
+            if(class_label == 0):
+                if membership>max:
+                    max = membership
+                    max_label = class_label
+            else:
+                if membership>(max+8.5):
+                    max = membership
+                    max_label = class_label
     return max_label
 
 
@@ -81,3 +95,43 @@ def classifyAllBinomial(x,data, counts,labels):
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify_binomial(x[i,:],data,counts,labels))
     return predictedLabels
+
+def kfoldCrossValidation(x,labels,k, positive_class):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        predictedLabels = classifyAll(x_test,x_train,labels_train)
+        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
+        recall = getRecall(labels_test,predictedLabels, positive_class)
+        precision = getPrecision(labels_test,predictedLabels, positive_class)
+        tp = getTP(labels_test,predictedLabels,positive_class)
+        tn = getTN(labels_test,predictedLabels,positive_class)
+        fp = getFP(labels_test,predictedLabels,positive_class)
+        fn = getFN(labels_test,predictedLabels,positive_class)
+        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
+    return np.mean(all_metrics,axis=0)
+
+def kfoldCrossValidationBinomial(x,counts,labels,k, positive_class):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        predictedLabels = classifyAllBinomial(x_test,x_train,counts, labels_train)
+        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
+        recall = getRecall(labels_test,predictedLabels, positive_class)
+        precision = getPrecision(labels_test,predictedLabels, positive_class)
+        tp = getTP(labels_test,predictedLabels,positive_class)
+        tn = getTN(labels_test,predictedLabels,positive_class)
+        fp = getFP(labels_test,predictedLabels,positive_class)
+        fn = getFN(labels_test,predictedLabels,positive_class)
+        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
+    return np.mean(all_metrics,axis=0)

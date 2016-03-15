@@ -75,3 +75,33 @@ def kfoldCrossValidation(x,labels,k, positive_class):
         fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
         all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
     return np.mean(all_metrics,axis=0)
+
+def kfoldCrossValidation3Classes(x,labels,k, positive_class):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        predictedLabels = classifyAll(x_test,x_train,labels_train)
+        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
+        recall = getRecall(labels_test,predictedLabels, positive_class)
+        precision = getPrecision(labels_test,predictedLabels, positive_class)
+        tp = getTP(labels_test,predictedLabels,positive_class)
+        tn = getTN(labels_test,predictedLabels,positive_class)
+        fp = getFP(labels_test,predictedLabels,positive_class)
+        fn = getFN(labels_test,predictedLabels,positive_class)
+        c00 = getN(labels_test,predictedLabels,0,0)
+        c01 = getN(labels_test,predictedLabels,0,1)
+        c02 = getN(labels_test,predictedLabels,0,2)
+        c10 = getN(labels_test,predictedLabels,1,0)
+        c11 = getN(labels_test,predictedLabels,1,1)
+        c12 = getN(labels_test,predictedLabels,1,2)
+        c20 = getN(labels_test,predictedLabels,2,0)
+        c21 = getN(labels_test,predictedLabels,2,1)
+        c22 = getN(labels_test,predictedLabels,2,2)
+
+        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure,c00,c01,c02,c10,c11,c12,c20,c21,c22])
+    return np.mean(all_metrics,axis=0)

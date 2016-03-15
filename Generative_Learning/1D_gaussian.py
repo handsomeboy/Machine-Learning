@@ -2,7 +2,7 @@
 
 from data_utils import *
 import numpy as np
-from generative_learning import *
+from gda import *
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
@@ -53,6 +53,8 @@ def main():
     ax.yaxis.set_visible(False)
     plt.xlabel('X')
     plt.show()
+
+    print("Confussion matrix: {}".format(getCM(labels,classifyAll(x,x,labels))))
 
 if __name__ == "__main__":
     main()
