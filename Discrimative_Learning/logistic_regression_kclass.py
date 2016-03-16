@@ -19,13 +19,13 @@ def classify(thetas, x, labels):
     kmax = None
     max = -9999999999
     for k in range(len(labels)):
-        value = softmax(thetas,x, k, labels)
+        value = softmax(thetas,x, k, labels, getSoftmaxDen(thetas,x,labels))
         if(value > max):
             kmax = k
             max = value
     return labels[kmax]
 
-def loglikelihood(thetas,x,y, labels):
+def loglikelihood(thetas,x,y, labels, all_softmax):
     sum = 0
     for i in range(x.shape[0]):
         xi = x[i]
@@ -33,7 +33,7 @@ def loglikelihood(thetas,x,y, labels):
         sum2 = 0
         for k in range(len(labels)):
             ind = indicator(k == yi)
-            sum2 += (ind * math.log(softmax(thetas,xi,k,labels)))
+            sum2 += (ind * math.log(all_softmax[i,k]))
         sum += sum2
     return sum
 
@@ -41,17 +41,20 @@ def train(x,labels, threshold=0.01):
     classes, y = np.unique(labels, return_inverse=True)
     return gradient_descent(x, y, classes,  threshold);
 
-def softmax(thetas, x, j, labels):
-    numerator = exp(np.dot(np.transpose(thetas[j]),x))
-    # denominator = np.sum(exp(np.dot(np.transpose(thetas),x)))
+def getSoftmaxDen(thetas, x, labels):
     den = 0
     for k in range(len(labels)):
         den += exp(np.dot(np.transpose(thetas[k]),x))
+    return den
 
-    return numerator / den
+def softmax(thetas, x, j, labels, softmaxDen):
+    numerator = exp(np.dot(np.transpose(thetas[j]),x))
+    # denominator = np.sum(exp(np.dot(np.transpose(thetas),x)))
+
+    return numerator / softmaxDen
 
 #gradient descent algorithm
-def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=400, delta=9999, learning_rate=0.0005 ):
+def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=20, delta=9999, learning_rate=0.000005 ):
     #iterative solution
     iterations = 0
     thetas = np.empty([len(labels),len(x[0])])
@@ -63,25 +66,39 @@ def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=400, delta=99
             thetas[j,i]=random.randrange(1,10)/1000
 
     all_likelihoods = np.empty([0,2])
-    all_likelihoods = np.append(all_likelihoods,[[0, loglikelihood(thetas,x,y,labels)]],axis=0)
+    # all_likelihoods = np.append(all_likelihoods,[[0, loglikelihood(thetas,x,y,labels)]],axis=0)
     # while (delta > threshold and iterations < maxIterations):
+    all_softmax = getAllSoftmax(thetas,x,labels)
     while (iterations < maxIterations):
+
         for j in range(len(labels)):
+            # current_softmax_den = getSoftmaxDen(thetas, x[i], j, labels)
             #update class j thetas
             sum=0
             for i in range(x.shape[0]):
-                sum += ( (softmax(thetas, x[i], j, labels) - indicator(y[i] == j)) * x[i])
+                sum += ( (all_softmax[i,j] - indicator(y[i] == j)) * x[i])
             new_thetas[j] = (thetas[j] - (learning_rate*sum))
 
+        all_softmax_new = getAllSoftmax(new_thetas,x,labels)
+
         # print(thetas,new_thetas)
-        delta = loglikelihood(new_thetas,x,y, labels) - loglikelihood(thetas,x,y, labels)
-        print(loglikelihood(new_thetas,x,y,labels),delta)
+        delta = loglikelihood(new_thetas,x,y, labels, all_softmax_new) - loglikelihood(thetas,x,y, labels, all_softmax)
+        print(loglikelihood(new_thetas,x,y,labels, all_softmax),delta)
         iterations += 1
-        all_likelihoods = np.append(all_likelihoods, [[iterations,loglikelihood(new_thetas,x,y,labels)]],axis=0 )
+        # all_likelihoods = np.append(all_likelihoods, [[iterations,loglikelihood(new_thetas,x,y,labels, all_softmax)]],axis=0 )
         #all_errors = np.append(all_errors,[[iterations,getMeanError(new_thetas,x,y)]],axis=0)
         for p in range(len(thetas)):
             thetas[p] = new_thetas[p]
+        all_softmax = all_softmax_new
     return thetas,all_likelihoods
+
+def getAllSoftmax(thetas, x, labels):
+    all_softmax = np.empty([x.shape[0],len(labels)])
+    for i in range(x.shape[0]):
+        softmaxDen = getSoftmaxDen(thetas,x[i],labels)
+        for j in range(len(labels)):
+            all_softmax[i,j] = softmax(thetas, x[i], j, labels, softmaxDen)
+    return all_softmax
 
 def classify_all(x,data,y):
     classes, y = np.unique(y, return_inverse=True)
