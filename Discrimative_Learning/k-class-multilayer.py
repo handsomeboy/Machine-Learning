@@ -2,7 +2,7 @@
 
 from data_utils import *
 import numpy as np
-from logistic_regression_kclass import *
+from multilayer import *
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib
@@ -12,7 +12,7 @@ def main():
     #read data
     x, labels = readData("C:/Users/marro/Repo/CS584/Generative_Learning/Data/iris.data",",",scale=False)
 
-    #use 0.001, and 900 iterations
+    #use 0.0005, and 500 iterations
 
     print("Training accuracy: {}".format(getAccuracy(labels,classify_all(x,x,labels),1)))
 

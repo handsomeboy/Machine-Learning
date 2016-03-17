@@ -54,7 +54,7 @@ def softmax(thetas, x, j, labels, softmaxDen):
     return numerator / softmaxDen
 
 #gradient descent algorithm
-def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=20, delta=9999, learning_rate=0.000005 ):
+def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=30, delta=9999, learning_rate=0.0005 ):
     #iterative solution
     iterations = 0
     thetas = np.empty([len(labels),len(x[0])])
