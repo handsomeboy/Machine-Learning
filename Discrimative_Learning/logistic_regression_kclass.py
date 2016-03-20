@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import itertools
 
 from scipy.spatial.distance import pdist
 import numpy as np
@@ -8,7 +9,7 @@ import numpy.linalg as linalg
 from sklearn import metrics
 from sklearn.cross_validation import KFold
 import random
-
+from metrics import *
 def indicator(condition):
     if(condition):
         return 1
@@ -37,9 +38,9 @@ def loglikelihood(thetas,x,y, labels, all_softmax):
         sum += sum2
     return sum
 
-def train(x,labels, threshold=0.01):
+def train(x,labels, threshold=0.01, maxIterations = 20, learning_rate=0.0005):
     classes, y = np.unique(labels, return_inverse=True)
-    return gradient_descent(x, y, classes,  threshold);
+    return gradient_descent(x, y, classes,  threshold, maxIterations=maxIterations, learning_rate=learning_rate);
 
 def getSoftmaxDen(thetas, x, labels):
     den = 0
@@ -54,7 +55,7 @@ def softmax(thetas, x, j, labels, softmaxDen):
     return numerator / softmaxDen
 
 #gradient descent algorithm
-def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=30, delta=9999, learning_rate=0.0005 ):
+def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=30, delta=9999, learning_rate=0.000005 ):
     #iterative solution
     iterations = 0
     thetas = np.empty([len(labels),len(x[0])])
@@ -80,10 +81,10 @@ def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=30, delta=999
             new_thetas[j] = (thetas[j] - (learning_rate*sum))
 
         all_softmax_new = getAllSoftmax(new_thetas,x,labels)
-
+        print(loglikelihood(new_thetas,x,y, labels, all_softmax_new))
         # print(thetas,new_thetas)
-        delta = loglikelihood(new_thetas,x,y, labels, all_softmax_new) - loglikelihood(thetas,x,y, labels, all_softmax)
-        print(loglikelihood(new_thetas,x,y,labels, all_softmax),delta)
+        # delta = loglikelihood(new_thetas,x,y, labels, all_softmax_new) - loglikelihood(thetas,x,y, labels, all_softmax)
+        # print(loglikelihood(new_thetas,x,y,labels, all_softmax),delta)
         iterations += 1
         # all_likelihoods = np.append(all_likelihoods, [[iterations,loglikelihood(new_thetas,x,y,labels, all_softmax)]],axis=0 )
         #all_errors = np.append(all_errors,[[iterations,getMeanError(new_thetas,x,y)]],axis=0)
@@ -100,10 +101,50 @@ def getAllSoftmax(thetas, x, labels):
             all_softmax[i,j] = softmax(thetas, x[i], j, labels, softmaxDen)
     return all_softmax
 
-def classify_all(x,data,y):
+def classify_all(x,data,y, thetas=None):
     classes, y = np.unique(y, return_inverse=True)
-    thetas,all_likelihoods = train(data,y)
+    if(thetas == None):
+        thetas,all_likelihoods = train(data,y,maxIterations=900,learning_rate=0.001)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(thetas,x[i], classes))
     return predictedLabels
+
+
+def kfoldCrossValidation3Classes(x,labels,k, positive_class):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    all_n = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        predictedLabels = classify_all(x_test,x_train,labels_train)
+        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
+        recall = getRecall(labels_test,predictedLabels, positive_class)
+        precision = getPrecision(labels_test,predictedLabels, positive_class)
+        tp = getTP(labels_test,predictedLabels,positive_class)
+        tn = getTN(labels_test,predictedLabels,positive_class)
+        fp = getFP(labels_test,predictedLabels,positive_class)
+        fn = getFN(labels_test,predictedLabels,positive_class)
+        digits = [0,1,2,3,4,5,6,7,8,9]
+        n = list()
+        for i in digits:
+            for j in digits:
+                n.append(getN(labels_test,predictedLabels,i,j))
+
+        # c00 = getN(labels_test,predictedLabels,1,1)
+        # c01 = getN(labels_test,predictedLabels,1,2)
+        # c02 = getN(labels_test,predictedLabels,1,3)
+        # c10 = getN(labels_test,predictedLabels,2,1)
+        # c11 = getN(labels_test,predictedLabels,2,2)
+        # c12 = getN(labels_test,predictedLabels,2,3)
+        # c20 = getN(labels_test,predictedLabels,3,1)
+        # c21 = getN(labels_test,predictedLabels,3,2)
+        # c22 = getN(labels_test,predictedLabels,3,3)
+        builtinaccuracy = metrics.accuracy_score(labels_test, predictedLabels)
+        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        all_n.append(n)
+        all_metrics.append([builtinaccuracy, accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
+    return np.mean(all_metrics,axis=0),np.mean(all_n,axis=0)

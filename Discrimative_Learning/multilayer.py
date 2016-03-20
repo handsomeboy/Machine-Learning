@@ -18,7 +18,7 @@ def indicator(condition):
 def classify(v,w, x, labels):
     kmax = None
     max = -9999999999
-    h = 8
+    h = 784
     z = np.empty([h])
     k = len(labels)
     ybar = np.empty([k])
@@ -48,9 +48,9 @@ def loglikelihood(x,y, ybar, labels):
         sum += sum2
     return -sum
 
-def train(x,labels, threshold=0.01):
+def train(x,labels, threshold=0.01, maxIterations = 900, learning_rate=0.001):
     classes, y = np.unique(labels, return_inverse=True)
-    return gradient_descent(x, y, classes,  threshold);
+    return gradient_descent(x, y, classes,  threshold, maxIterations=maxIterations, learning_rate=learning_rate);
 
 def getSoftmaxDen(thetas, x, labels):
     den = 0
@@ -74,7 +74,7 @@ def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=900, delta=99
     k = len(labels)
     n = x.shape[1]
     m = x.shape[0]
-    h = 8
+    h = 784
     v = np.random.rand(k,h)/10
     w = np.random.rand(h,n)/10
     z = np.empty([m,h])
@@ -116,9 +116,10 @@ def getAllSoftmax(thetas, x, labels):
             all_softmax[i,j] = softmax(thetas, x[i], j, labels, softmaxDen)
     return all_softmax
 
-def classify_all(x,data,y):
+def classify_all(x,data,y, v = None, w = None):
     classes, y = np.unique(y, return_inverse=True)
-    v,w = train(data,y)
+    if (v == None):
+        v,w = train(data,y)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(v,w,x[i], classes))

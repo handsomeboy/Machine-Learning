@@ -12,7 +12,7 @@ def getTP(labels, predictedLabels, class_label):
 def getN(labels,predictedLabels, c1,c2):
     sum = 0
     for i in range(0,labels.shape[0]):
-        if(labels[i] == c2 and predictedLabels[i] ==  c2):
+        if(labels[i] == c1 and predictedLabels[i] ==  c2):
             sum += 1
     return sum
 
