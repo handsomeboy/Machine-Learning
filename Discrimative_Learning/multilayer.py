@@ -8,6 +8,7 @@ import numpy.linalg as linalg
 from sklearn import metrics
 from sklearn.cross_validation import KFold
 import random
+from metrics import *
 
 def indicator(condition):
     if(condition):
@@ -15,10 +16,10 @@ def indicator(condition):
     else:
         return 0
 
-def classify(v,w, x, labels):
+def classify(v,w, x, labels, h):
     kmax = None
     max = -9999999999
-    h = 784
+
     z = np.empty([h])
     k = len(labels)
     ybar = np.empty([k])
@@ -48,9 +49,9 @@ def loglikelihood(x,y, ybar, labels):
         sum += sum2
     return -sum
 
-def train(x,labels, threshold=0.01, maxIterations = 900, learning_rate=0.001):
+def train(x,labels, h, threshold=0.01, maxIterations = 900, learning_rate=0.001):
     classes, y = np.unique(labels, return_inverse=True)
-    return gradient_descent(x, y, classes,  threshold, maxIterations=maxIterations, learning_rate=learning_rate);
+    return gradient_descent(x, y, classes,  threshold=threshold, h=h, maxIterations=maxIterations, learning_rate=learning_rate);
 
 def getSoftmaxDen(thetas, x, labels):
     den = 0
@@ -65,31 +66,44 @@ def softmax(thetas, x, j, labels, softmaxDen):
     return numerator / softmaxDen
 
 def sigmoid(thetas, x):
-    return 1 / (1 + exp(-np.dot(np.transpose(thetas),x)))
+    return 1 / (1 + np.exp(-np.dot(np.transpose(thetas),x)))
 
 #gradient descent algorithm
-def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=900, delta=9999, learning_rate=0.001):
+def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9999, learning_rate=0.001):
     #iterative solution
     iterations = 0
     k = len(labels)
     n = x.shape[1]
     m = x.shape[0]
-    h = 784
     v = np.random.rand(k,h)/10
     w = np.random.rand(h,n)/10
     z = np.empty([m,h])
     ybar = np.empty([m,k])
-
-    while (iterations < maxIterations):
+    delta = 9999
+    logl = 0
+    all_likelihoods = np.empty([0,2])
+    z = np.transpose(sigmoid(np.transpose(w),np.transpose(x)))
+    #computer ybar
+    for i in range(m):
+        for j in range(k):
+            ybar[i,j] = softmax(v,z[i],j,labels,getSoftmaxDen(v,z[i],labels))
+    newloglikelihood = loglikelihood(x,y,ybar,labels)
+    print(newloglikelihood)
+    delta = newloglikelihood - logl
+    all_likelihoods = np.append(all_likelihoods,[[0,loglikelihood(x,y,ybar,labels)]],axis=0)
+    while (iterations < maxIterations and delta > threshold):
         #compute z
-        for i in range(m):
-            for j in range(h):
-                z[i,j] = sigmoid(w[j],x[i])
+        # for i in range(m):
+        #     for j in range(h):
+        #         z[i,j] = sigmoid(w[j],x[i])
+        z = np.transpose(sigmoid(np.transpose(w),np.transpose(x)))
         #computer ybar
         for i in range(m):
             for j in range(k):
                 ybar[i,j] = softmax(v,z[i],j,labels,getSoftmaxDen(v,z[i],labels))
-        print(loglikelihood(x,y,ybar,labels))
+        newloglikelihood = loglikelihood(x,y,ybar,labels)
+        print(newloglikelihood)
+        delta = newloglikelihood - logl
         #update v
         for j in range(k):
             sum = 0
@@ -106,7 +120,8 @@ def gradient_descent(x,y, labels, threshold=0.00001, maxIterations=900, delta=99
                 sum += sum2 * z[i,j] * (1-z[i,j]) * x[i]
             w[j] -= learning_rate * sum
         iterations += 1
-    return v,w
+        all_likelihoods = np.append(all_likelihoods,[[iterations,loglikelihood(x,y,ybar,labels)]],axis=0)
+    return v,w, iterations, all_likelihoods
 
 def getAllSoftmax(thetas, x, labels):
     all_softmax = np.empty([x.shape[0],len(labels)])
@@ -116,11 +131,30 @@ def getAllSoftmax(thetas, x, labels):
             all_softmax[i,j] = softmax(thetas, x[i], j, labels, softmaxDen)
     return all_softmax
 
-def classify_all(x,data,y, v = None, w = None):
+def classify_all(x,data,y,maxIterations, learning_rate, v = None, w = None, h=None, ):
     classes, y = np.unique(y, return_inverse=True)
     if (v == None):
-        v,w = train(data,y)
+        v,w = train(data,y,  h=h, maxIterations=maxIterations,learning_rate=learning_rate)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
-        predictedLabels.append(classify(v,w,x[i], classes))
+        predictedLabels.append(classify(v,w,x[i], classes, h=h))
     return predictedLabels
+
+def kfoldCrossValidation(x,labels,k, positive_class, h, maxIterations,learning_rate):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    all_n = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        predictedLabels = classify_all(x_test,x_train,labels_train, maxIterations=maxIterations,learning_rate=learning_rate, h=h)
+        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
+        recall = getRecall(labels_test,predictedLabels, positive_class)
+        precision = getPrecision(labels_test,predictedLabels, positive_class)
+
+        builtinaccuracy = metrics.accuracy_score(labels_test, predictedLabels)
+        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        all_metrics.append([builtinaccuracy, accuracy,recall,precision,fmeasure])
+    return np.mean(all_metrics,axis=0)

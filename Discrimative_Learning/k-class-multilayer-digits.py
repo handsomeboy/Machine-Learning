@@ -11,12 +11,15 @@ from get_digits_data import *
 def main():
     #read data
     X,y = getDigitsData()
-    X_train, X_test = X[:40000], X[40000:]
-    y_train, y_test = y[:40000], y[40000:]
 
-    classes, y = np.unique(y_train, return_inverse=True)
-    v,w = train(X_train,y_train, maxIterations=10,learning_rate=0.0000001)
-    print("Training accuracy: {}".format(getAccuracy(y_train,classify_all(X_train,X_train,y_train,v,w),1)))
+    ind = [ k for k in range(len(y)) if y[k] in [0,1,2] ]
+
+    X = X[ind]
+    y = y[ind]
+
+    classes, y = np.unique(y, return_inverse=True)
+    v,w = train(X,y, maxIterations=10,learning_rate=0.0000001)
+    print("Training accuracy: {}".format(getAccuracy(y,classify_all(X,X,y,v,w),1)))
 
 
     # classes, y = np.unique(y, return_inverse=True)
