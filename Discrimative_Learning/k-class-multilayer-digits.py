@@ -17,9 +17,19 @@ def main():
     X = X[ind]
     y = y[ind]
 
+    #shuffle
+    p = np.random.permutation(len(X))
+    X = X[p]
+    y = y[p]
+
+    X = X[:500]
+    y = y[:500]
+
+
     classes, y = np.unique(y, return_inverse=True)
-    v,w = train(X,y, maxIterations=10,learning_rate=0.0000001)
-    print("Training accuracy: {}".format(getAccuracy(y,classify_all(X,X,y,v,w),1)))
+    v,w,iterations, all_likelihoods = train(X,y, h=500, maxIterations=500,learning_rate=0.00002)
+    print(iterations)
+    print("Training accuracy: {}".format(getAccuracy(y,classify_all(X,X,y,maxIterations=50,learning_rate=0.000001,v=v,w=w,h=500),1)))
 
 
     # classes, y = np.unique(y, return_inverse=True)

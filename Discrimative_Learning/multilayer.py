@@ -2,6 +2,7 @@
 
 from scipy.spatial.distance import pdist
 import numpy as np
+from copy import deepcopy
 import math
 from math import exp
 import numpy.linalg as linalg
@@ -69,14 +70,18 @@ def sigmoid(thetas, x):
     return 1 / (1 + np.exp(-np.dot(np.transpose(thetas),x)))
 
 #gradient descent algorithm
-def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9999, learning_rate=0.001):
+def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9999, learning_rate=0.001, iv=None,iw=None):
     #iterative solution
     iterations = 0
     k = len(labels)
     n = x.shape[1]
     m = x.shape[0]
-    v = np.random.rand(k,h)/10
-    w = np.random.rand(h,n)/10
+    if(iv==None):
+        v = np.random.rand(k,h)/10
+        w = np.random.rand(h,n)/10
+    else:
+        v = deepcopy(iv)
+        w = deepcopy(iw)
     z = np.empty([m,h])
     ybar = np.empty([m,k])
     delta = 9999
@@ -102,7 +107,7 @@ def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9
             for j in range(k):
                 ybar[i,j] = softmax(v,z[i],j,labels,getSoftmaxDen(v,z[i],labels))
         newloglikelihood = loglikelihood(x,y,ybar,labels)
-        print(newloglikelihood)
+        print(iterations,newloglikelihood)
         delta = newloglikelihood - logl
         #update v
         for j in range(k):

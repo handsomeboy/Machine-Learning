@@ -34,16 +34,21 @@ def main():
     # print(fmeasures)
 
     handles = np.empty([0,1])
+    k = len(labels)
+    h=4
+    n = x.shape[1]
+    iv = np.random.rand(k,h)/10
+    iw = np.random.rand(h,n)/10
     for lr in [0.001,0.002, 0.003, 0.004, 0.005]:
         #perform gradient descent
-        v,w, iterations, errors = gradient_descent(x,y, classes, h=4, maxIterations=401,learning_rate=0.0005)
+        v,w, iterations, errors = gradient_descent(x,y, classes, h=4, maxIterations=100,learning_rate=lr,iv=iv,iw=iw)
         # print("Itearative Method Coefficients: {},Iterations:{}".format(thetas,iterations))
-        handle = plt.plot(errors[0:200,0],errors[0:200,1], linewidth = 4, label="Learning Weight = {:.6f}".format(lr))
+        handle = plt.plot(errors[1:100,0],errors[1:100,1], linewidth = 4, label="Learning Rate = {:.3f}".format(lr))
         handles = np.append(handles,handle)
     plt.legend(handles=[handles[0],handles[1],handles[2],handles[3],handles[4]])
     plt.ticklabel_format(useOffset=False)
     plt.xlabel("Iteration")
-    plt.ylabel("Squared Mean Error")
+    plt.ylabel("- log likelihood")
     plt.show()
 
 
