@@ -104,7 +104,7 @@ def getAllSoftmax(thetas, x, labels):
 def classify_all(x,data,y, thetas=None):
     classes, y = np.unique(y, return_inverse=True)
     if(thetas == None):
-        thetas,all_likelihoods = train(data,y,maxIterations=900,learning_rate=0.001)
+        thetas,all_likelihoods = train(data,y,maxIterations=900,learning_rate=0.000005)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(thetas,x[i], classes))
@@ -134,15 +134,6 @@ def kfoldCrossValidation3Classes(x,labels,k, positive_class):
             for j in digits:
                 n.append(getN(labels_test,predictedLabels,i,j))
 
-        # c00 = getN(labels_test,predictedLabels,1,1)
-        # c01 = getN(labels_test,predictedLabels,1,2)
-        # c02 = getN(labels_test,predictedLabels,1,3)
-        # c10 = getN(labels_test,predictedLabels,2,1)
-        # c11 = getN(labels_test,predictedLabels,2,2)
-        # c12 = getN(labels_test,predictedLabels,2,3)
-        # c20 = getN(labels_test,predictedLabels,3,1)
-        # c21 = getN(labels_test,predictedLabels,3,2)
-        # c22 = getN(labels_test,predictedLabels,3,3)
         builtinaccuracy = metrics.accuracy_score(labels_test, predictedLabels)
         fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
         all_n.append(n)

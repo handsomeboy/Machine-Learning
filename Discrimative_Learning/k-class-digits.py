@@ -21,9 +21,8 @@ def main():
     y_train = y_train[p]
 
     all_metrics, all_n = kfoldCrossValidation3Classes(X_train,y_train, 10, 3)
-    np.savetxt("foo.csv", all_n.reshape(10,10), delimiter=",", fmt='%7.2f')
+    np.savetxt("confusion.csv", all_n.reshape(10,10), delimiter=",", fmt='%7.2f')
     print("Kfold Accuracy, recall, precission,tp,tn,fp,fn: {}".format(all_metrics))
-    print("all_n {}".format(all_n))
 
     #use 0.000005
     thetas, all_likelihoods = train(X_train,y,maxIterations=20, learning_rate=0.000005)

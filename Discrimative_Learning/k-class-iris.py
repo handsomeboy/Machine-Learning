@@ -10,7 +10,7 @@ from metrics import *
 
 def main():
     #read data
-    x, labels = readData("C:/Users/marro/Repo/CS584/Generative_Learning/Data/iris.data",",",scale=False)
+    x, labels = readData("Data/iris.data",",",scale=False)
 
     #shuffle
     p = np.random.permutation(len(x))

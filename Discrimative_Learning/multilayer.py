@@ -10,6 +10,8 @@ from sklearn import metrics
 from sklearn.cross_validation import KFold
 import random
 from metrics import *
+import pyximport;
+import learnmultilayer
 
 def indicator(condition):
     if(condition):
@@ -52,7 +54,7 @@ def loglikelihood(x,y, ybar, labels):
 
 def train(x,labels, h, threshold=0.01, maxIterations = 900, learning_rate=0.001):
     classes, y = np.unique(labels, return_inverse=True)
-    return gradient_descent(x, y, classes,  threshold=threshold, h=h, maxIterations=maxIterations, learning_rate=learning_rate);
+    return learnmultilayer.gradient_descent(x, y, classes,  threshold=threshold, h=h, maxIterations=maxIterations, learning_rate=learning_rate);
 
 def getSoftmaxDen(thetas, x, labels):
     den = 0
@@ -139,7 +141,7 @@ def getAllSoftmax(thetas, x, labels):
 def classify_all(x,data,y,maxIterations, learning_rate, v = None, w = None, h=None, ):
     classes, y = np.unique(y, return_inverse=True)
     if (v == None):
-        v,w = train(data,y,  h=h, maxIterations=maxIterations,learning_rate=learning_rate)
+        v,w,it,al = train(data,y,  h=h, maxIterations=maxIterations,learning_rate=learning_rate)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(v,w,x[i], classes, h=h))
