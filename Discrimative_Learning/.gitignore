@@ -1,2 +1,8 @@
 __pycache__/
 Report/
+*.pyc
+build/
+*.so
+results
+*.png
+*.c
