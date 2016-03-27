@@ -33,7 +33,7 @@ def sigmoid(thetas, x):
 
 #gradient descent algorithm
 def gradient_descent(x,y, threshold=0.01, maxIterations=1000, delta=9999, learning_rate=0.0003 ):
-    #iterative solution
+
     iterations = 0
     thetas = []
 
@@ -49,23 +49,20 @@ def gradient_descent(x,y, threshold=0.01, maxIterations=1000, delta=9999, learni
             sum += (sigmoid(thetas,x[i]) - y[i]) * x[i]
         new_thetas = thetas - (learning_rate*sum)
         delta = loglikelihood(new_thetas,x,y) - loglikelihood(thetas,x,y)
-
         iterations += 1
         all_likelihoods = np.append(all_likelihoods, [[iterations,loglikelihood(new_thetas,x,y)]],axis=0 )
-        # print(iterations, loglikelihood(new_thetas,x,y))
-        #all_errors = np.append(all_errors,[[iterations,getMeanError(new_thetas,x,y)]],axis=0)
         thetas = new_thetas
     return thetas,all_likelihoods
 
-def classify_all(x,data,y, thetas=None):
+def classify_all(x,data,y, thetas=None, maxIterations=400, learning_rate=0.00001):
     if(thetas == None):
-        thetas,all_likelihoods = train(data,y)
+        thetas,all_likelihoods = train(data,y, maxIterations=maxIterations, learning_rate=learning_rate)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(thetas,x[i]))
     return predictedLabels
 
-def kfoldCrossValidation(x,labels,k, positive_class):
+def kfoldCrossValidation(x,labels,k, positive_class, maxIterations, learning_rate):
     kf = KFold(len(x), n_folds=k)
     all_metrics = list()
     for train_index, test_index in kf:
@@ -73,7 +70,7 @@ def kfoldCrossValidation(x,labels,k, positive_class):
         labels_train = labels[train_index]
         x_test = x[test_index]
         labels_test = labels[test_index]
-        predictedLabels = classify_all(x_test,x_train,labels_train)
+        predictedLabels = classify_all(x_test,x_train,labels_train, maxIterations=maxIterations, learning_rate=learning_rate)
         accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
         recall = getRecall(labels_test,predictedLabels, positive_class)
         precision = getPrecision(labels_test,predictedLabels, positive_class)
@@ -82,5 +79,6 @@ def kfoldCrossValidation(x,labels,k, positive_class):
         fp = getFP(labels_test,predictedLabels,positive_class)
         fn = getFN(labels_test,predictedLabels,positive_class)
         fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
+        print(accuracy)
         all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
     return np.mean(all_metrics,axis=0)
