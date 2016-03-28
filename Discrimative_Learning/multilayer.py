@@ -52,9 +52,9 @@ def loglikelihood(x,y, ybar, labels):
         sum += sum2
     return -sum
 
-def train(x,labels, h, threshold=0.01, maxIterations = 900, learning_rate=0.001):
+def train(x,labels, h, threshold=0.01, maxIterations = 900, learning_rate=0.001, learning_rate_v=0.0001):
     classes, y = np.unique(labels, return_inverse=True)
-    return learnmultilayer.gradient_descent(x, y, classes,  threshold=threshold, h=h, maxIterations=maxIterations, learning_rate=learning_rate);
+    return learnmultilayer.gradient_descent(x, y, classes,  threshold=threshold, h=h, maxIterations=maxIterations, learning_rate=learning_rate, learning_rate_v=learning_rate_v);
 
 def getSoftmaxDen(thetas, x, labels):
     den = 0
@@ -64,8 +64,6 @@ def getSoftmaxDen(thetas, x, labels):
 
 def softmax(thetas, x, j, labels, softmaxDen):
     numerator = exp(np.dot(np.transpose(thetas[j]),x))
-    # denominator = np.sum(exp(np.dot(np.transpose(thetas),x)))
-
     return numerator / softmaxDen
 
 def sigmoid(thetas, x):
@@ -100,9 +98,6 @@ def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9
     all_likelihoods = np.append(all_likelihoods,[[0,loglikelihood(x,y,ybar,labels)]],axis=0)
     while (iterations < maxIterations and delta > threshold):
         #compute z
-        # for i in range(m):
-        #     for j in range(h):
-        #         z[i,j] = sigmoid(w[j],x[i])
         z = np.transpose(sigmoid(np.transpose(w),np.transpose(x)))
         #computer ybar
         for i in range(m):
@@ -138,16 +133,16 @@ def getAllSoftmax(thetas, x, labels):
             all_softmax[i,j] = softmax(thetas, x[i], j, labels, softmaxDen)
     return all_softmax
 
-def classify_all(x,data,y,maxIterations, learning_rate, v = None, w = None, h=None, ):
+def classify_all(x,data,y,maxIterations, learning_rate, learning_rate_v, v = None, w = None, h=None ):
     classes, y = np.unique(y, return_inverse=True)
     if (v == None):
-        v,w,it,al = train(data,y,  h=h, maxIterations=maxIterations,learning_rate=learning_rate)
+        v,w,it,al = train(data,y,  h=h, maxIterations=maxIterations,learning_rate=learning_rate, learning_rate_v=learning_rate_v)
     predictedLabels = list()
     for i in range(0,x.shape[0]):
         predictedLabels.append(classify(v,w,x[i], classes, h=h))
     return predictedLabels
 
-def kfoldCrossValidation(x,labels,k, positive_class, h, maxIterations,learning_rate):
+def kfoldCrossValidation(x,labels,k, h, maxIterations,learning_rate, learning_rate_v):
     kf = KFold(len(x), n_folds=k)
     all_metrics = list()
     all_n = list()
@@ -156,12 +151,9 @@ def kfoldCrossValidation(x,labels,k, positive_class, h, maxIterations,learning_r
         labels_train = labels[train_index]
         x_test = x[test_index]
         labels_test = labels[test_index]
-        predictedLabels = classify_all(x_test,x_train,labels_train, maxIterations=maxIterations,learning_rate=learning_rate, h=h)
-        accuracy = getAccuracy(labels_test,predictedLabels, positive_class)
-        recall = getRecall(labels_test,predictedLabels, positive_class)
-        precision = getPrecision(labels_test,predictedLabels, positive_class)
+        predictedLabels = classify_all(x_test,x_train,labels_train, maxIterations=maxIterations,learning_rate=learning_rate, learning_rate_v=learning_rate_v, h=h)
 
         builtinaccuracy = metrics.accuracy_score(labels_test, predictedLabels)
-        fmeasure = getFMeasure(labels_test,predictedLabels,positive_class)
-        all_metrics.append([builtinaccuracy, accuracy,recall,precision,fmeasure])
+        fmeasure = getFMeasure(labels_test,predictedLabels,1)
+        all_metrics.append([builtinaccuracy,fmeasure])
     return np.mean(all_metrics,axis=0)

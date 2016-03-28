@@ -45,7 +45,7 @@ def softmax(thetas, x, j, labels, softmaxDen):
 
     return numerator / softmaxDen
 
-def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9999, learning_rate=0.001, iv=None,iw=None):
+def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9999, learning_rate=0.001, learning_rate_v=0.0001, iv=None,iw=None):
     #iterative solution
     cdef iterations = 0
     cdef k = len(labels)
@@ -89,7 +89,7 @@ def gradient_descent(x,y, labels, h, threshold=0.001, maxIterations=900, delta=9
             sum = 0
             for i in range(m):
                 sum += ((ybar[i,j] - indicator(y[i]==j)) * z[i])
-            v[j] -= 0.0001 * sum
+            v[j] -= learning_rate_v * sum
         #update w
         for j in range(h):
             sum = 0

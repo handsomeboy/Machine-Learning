@@ -54,11 +54,10 @@ def getCM(labels,predictedLabels):
     return cm
 
 def getAccuracy(labels,predictedLabels, positive_label):
-    #predictedLabels = classifyAll(x,x,labels)
     totalExamples = labels.shape[0]
-    accuracy = (getTP(labels,predictedLabels,positive_label) + getTN(labels,predictedLabels,positive_label))/ totalExamples
-    print ("Built-in accuracy = {}".format(metrics.accuracy_score(labels, predictedLabels)))
-    print ("Accuracy = {}".format(accuracy))
+    accuracy = (getTP(labels,predictedLabels,positive_label) + getTN(labels,predictedLabels,positive_label))/ float(totalExamples)
+    #print ("Built-in accuracy = {}".format(metrics.accuracy_score(labels, predictedLabels)))
+    #print ("Accuracy = {}".format(accuracy))
     return accuracy
 
 def getRecall(labels,predictedLabels, positive_label):
@@ -66,8 +65,8 @@ def getRecall(labels,predictedLabels, positive_label):
         recall = 0
     else:
         recall = getTP(labels,predictedLabels,positive_label)/(getTP(labels,predictedLabels,positive_label)+getFN(labels,predictedLabels,positive_label))
-    print ("Built-in recall = {}".format(metrics.recall_score(labels, predictedLabels)))
-    print ("Recall = {}".format(recall))
+    #print ("Built-in recall = {}".format(metrics.recall_score(labels, predictedLabels)))
+    #print ("Recall = {}".format(recall))
     return recall
 
 def getPrecision(labels,predictedLabels, positive_label):
@@ -75,8 +74,8 @@ def getPrecision(labels,predictedLabels, positive_label):
         precision = 0
     else:
         precision = getTP(labels,predictedLabels,positive_label)/(getTP(labels,predictedLabels,positive_label)+getFP(labels,predictedLabels,positive_label))
-    print ("Built-in precision = {}".format(metrics.precision_score(labels, predictedLabels)))
-    print ("Precision = {}".format(precision))
+    #print ("Built-in precision = {}".format(metrics.precision_score(labels, predictedLabels)))
+    #print ("Precision = {}".format(precision))
     return precision
 
 def getFMeasure(labels,predictedLabels, positive_label):
