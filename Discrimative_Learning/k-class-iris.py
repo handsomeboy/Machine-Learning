@@ -17,10 +17,10 @@ def main():
     x = x[p]
     labels = labels[p]
 
-    #use 0.001, and 900 iterations
-    # thetas,all_likelihoods = train(x,labels,0.01,900,0.0005)
-    # print("Training accuracy: {}".format(getAccuracy(labels,classify_all(x,x,labels, thetas),1)))
-    print("Kfold Accuracy, recall, precission,tp,tn,fp,fn: {}".format(kfoldCrossValidation3Classes(x,labels, 10, 3)))
+    classes, y = np.unique(labels, return_inverse=True)
+
+    #evaluate using 10 fold cross validation
+    print("Kfold Accuracy, fmeasure, confusion matrix: {}".format(kfoldCrossValidation(x,y, 10, maxIterations=900, learning_rate=0.001)))
 
 if __name__ == "__main__":
     main()
