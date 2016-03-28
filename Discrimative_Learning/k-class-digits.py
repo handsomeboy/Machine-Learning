@@ -9,6 +9,11 @@ import matplotlib
 from get_digits_data import *
 from metrics import *
 
+#map matrix to a higher polynomial degree
+def mapFeatures(x, degree):
+    poly = preprocessing.PolynomialFeatures(degree,interaction_only=True)
+    return poly.fit_transform(x)
+
 def main():
     #read data
     X,y = getDigitsData()
@@ -19,6 +24,8 @@ def main():
     p = np.random.permutation(len(X_train))
     X_train = X_train[p]
     y_train = y_train[p]
+
+    X_train = mapFeatures(X_train,1)
 
     #evaluate using 10 fold cross validation
     all_metrics, all_n = kfoldCrossValidation(X_train,y_train, 10, maxIterations=20, learning_rate=0.000005)
