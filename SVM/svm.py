@@ -43,16 +43,15 @@ def train(X,y,c=9999):
         w += alphas[i] * y[i] * X[i,:]
 
     #calculate w0
-    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > 9 ]
-    # index, value = max(enumerate(alphas), key=operator.itemgetter(1))
-    # print(index,value)
+    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > 0.1 ]
+
     w0 = 0
     for i in support_vectors_idx:
         print("support vector: {}".format(i,X[i,:]))
         w0 += (y[i] - np.dot(w,X[i,:]))
     w0 = w0/len(support_vectors_idx)
-    # w0 = y[index] - np.dot(w,X[index,:])
-    return w,w0
+
+    return w,w0, support_vectors_idx
 
 def classify(x,w,w0):
     if(np.dot(w, x) + w0 > 0):
