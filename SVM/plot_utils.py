@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
-from generate_datasets import mapFeatures
+from separable_datasets import mapFeatures
 import matplotlib.pyplot as plt
 import pylab
 import matplotlib

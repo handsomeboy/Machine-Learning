@@ -6,9 +6,12 @@ import plot_utils as pu
 from sklearn import preprocessing
 import svm as svm
 
-def mapFeatures(x, degree):
-    poly = preprocessing.PolynomialFeatures(degree)
-    return poly.fit_transform(x)
+
+def trans_val(val):
+    if(val > 0):
+        return 1
+    else:
+        return -1
 
 def func(x):
     if (np.dot(x, [-2,-1]) > 0):
@@ -16,13 +19,12 @@ def func(x):
     else :
         return -1
 
-
 def func2(x):
-    val = np.dot(x, [-1,-2,-1])
-    if (abs(val - 0) < 0.5):
+    val = np.dot(x, [-2,-1])
+    if (abs(val - 0) < 3):
         if(random.random() < 0.5):
-            return 1 * (not(val>0))
-    return 1 * (val>0)
+            return trans_val(-1*val)
+    return trans_val(val)
 
 def main():
     m=100
@@ -30,10 +32,11 @@ def main():
     X[:,0] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
     X[:,1] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
 
-    #linearly separable
-    y = np.empty([m,1])
-    for i in range(m):
-        y[i] = func(X[i,])
+    #not separable
+    y = np.empty([100,1])
+    for i in range(X.shape[0]):
+        y[i] = func2(X[i,:])
+
 
     #plot data and decision surface
     ax = pu.plot_data(X,y)
@@ -41,7 +44,7 @@ def main():
     plt.show()
 
     #train svm
-    w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999)
+    w,w0, support_vectors_idx = svm.train(X,y,c=99,eps=4)
 
     #plot result
     predicted_labels = svm.classify_all(X,w,w0)
@@ -53,11 +56,7 @@ def main():
     plt.show()
 
 
-    #not separable
-    # y = np.empty([100,1])
-    # for i in range(X.shape[0]):
-    #     y[i] = func2(X[i,:])
-    #
+
     # # plot data and decision surface
     # ax = plt.gca()
     # cm_bright = ListedColormap(['#FF0000', '#0000FF'])

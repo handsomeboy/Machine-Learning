@@ -4,7 +4,7 @@ from cvxopt import solvers, matrix
 import operator
 from sklearn import metrics
 
-def train(X,y,c=9999):
+def train(X,y,c=9999, eps=0.1):
     m = X.shape[0]
     n = X.shape[1]
     #p
@@ -43,7 +43,7 @@ def train(X,y,c=9999):
         w += alphas[i] * y[i] * X[i,:]
 
     #calculate w0
-    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > 0.1 ]
+    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > eps ]
 
     w0 = 0
     for i in support_vectors_idx:
