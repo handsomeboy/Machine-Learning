@@ -11,7 +11,11 @@ def mapFeatures(x, degree):
     return poly.fit_transform(x)
 
 def func(x):
-    return 1 * (np.dot(x, [2,-1])>0)
+    if (np.dot(x, [-2,-1]) > 0):
+        return 1
+    else :
+        return -1
+
 
 def func2(x):
     val = np.dot(x, [-1,-2,-1])
@@ -21,12 +25,15 @@ def func2(x):
     return 1 * (val>0)
 
 def main():
-    X = np.empty([500,2])
-    X[:,0] = np.matrix((random.sample(range(-10000, 10000), 500))) / float(1000)
-    X[:,1] = np.matrix((random.sample(range(-10000, 10000), 500))) / float(1000)
+    m=500
+    X = np.empty([m,2])
+    X[:,0] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
+    X[:,1] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
 
     #linearly separable
-    y = func(X)
+    y = np.empty([m,1])
+    for i in range(m):
+        y[i] = func(X[i,])
 
     #plot data and decision surface
     ax = plt.gca()

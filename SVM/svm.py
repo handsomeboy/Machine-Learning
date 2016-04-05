@@ -26,7 +26,7 @@ def train(X,y,c=9999):
         h[i]=c
     h = matrix(h,tc='d')
     #A
-    A = y.T
+    A = y
     A = matrix(A, tc='d').T
     #b
     b=np.zeros([1,1])
@@ -43,18 +43,22 @@ def train(X,y,c=9999):
         w += alphas[i] * y[i] * X[i,:]
 
     #calculate w0
-    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > 0.1 ]
+    support_vectors_idx = [ k for k in range(len(alphas)) if alphas[k] > 9 ]
     # index, value = max(enumerate(alphas), key=operator.itemgetter(1))
-
+    # print(index,value)
     w0 = 0
-    for i in range(len(support_vectors_idx)):
-        print("support vector: {}".format(X[i,:]))
+    for i in support_vectors_idx:
+        print("support vector: {}".format(i,X[i,:]))
         w0 += (y[i] - np.dot(w,X[i,:]))
     w0 = w0/len(support_vectors_idx)
+    # w0 = y[index] - np.dot(w,X[index,:])
     return w,w0
 
 def classify(x,w,w0):
-    return 1 * (np.dot(w, x) + w0 > 0)
+    if(np.dot(w, x) + w0 > 0):
+        return 1
+    else:
+        return -1
 
 def classify_all(X,w,w0):
     predictedLabels = list()
