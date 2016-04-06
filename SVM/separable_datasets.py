@@ -18,10 +18,12 @@ def func(x):
 
 
 def main():
-    m=100
+    m=200
     X = np.empty([m,2])
     X[:,0] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
     X[:,1] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
+
+    preprocessing.scale(X)
 
     #linearly separable
     y = np.empty([m,1])
@@ -34,7 +36,7 @@ def main():
     plt.show()
 
     #train svm
-    w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999)
+    w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999, eps=0.000001)
 
     #plot result
     predicted_labels = svm.classify_all(X,w,w0)

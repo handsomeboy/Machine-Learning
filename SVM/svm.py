@@ -3,12 +3,35 @@ import cvxopt
 from cvxopt import solvers, matrix
 import operator
 from sklearn import metrics
+from scipy.spatial.distance import pdist, squareform
+import scipy
+from sklearn import preprocessing, metrics
 
-def train(X,y,c=9999, eps=0.1):
+def getDistanceGramMatrix(X):
+    return squareform(pdist(X, 'euclidean'))
+
+def getGaussianGramMatrix(X,s):
+    gram = getDistanceGramMatrix(X)
+    return scipy.exp(-(gram**2) / (2*(s**2)))
+
+def getPolynomialGramMatrix(X, degree):
+    return metrics.pairwise.polynomial_kernel(X,degree=degree)
+
+def getGramMatrix(X,type=None):
+    if(type == None):
+        return np.dot(X, X.T)
+    elif (type == 'gaussian'):
+        return getGaussianGramMatrix(X,10)
+    elif (type == 'polynomial'):
+        return getPolynomialGramMatrix(X, 2)
+
+def train(X,y,c=9999, eps=0.1, type=None):
     m = X.shape[0]
     n = X.shape[1]
     #p
-    P = np.dot(y,y.T) * np.dot(X,X.T)
+    gm = getGramMatrix(X,type)
+
+    P = np.dot(y,y.T) * gm
     P = matrix(P, tc='d')
     #q
     q = np.empty([m, 1])
@@ -49,7 +72,8 @@ def train(X,y,c=9999, eps=0.1):
     for i in support_vectors_idx:
         print("support vector: {}".format(i,X[i,:]))
         w0 += (y[i] - np.dot(w,X[i,:]))
-    w0 = w0/len(support_vectors_idx)
+    if(w0 != 0):
+        w0 = w0/len(support_vectors_idx)
 
     return w,w0, support_vectors_idx
 
