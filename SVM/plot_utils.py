@@ -58,11 +58,15 @@ def plot_data(X,y, support_vectors=[]):
     ax = plt.gca()
     cm_bright = ListedColormap(['red', 'blue'])
 
-    notsv = [i for i in range(X.shape[0]) if i not in support_vectors]
+    notsvc1 = [i for i in range(X.shape[0]) if i not in support_vectors and(y[i]==-1)]
+    notsvc2 = [i for i in range(X.shape[0]) if i not in support_vectors and (y[i] == 1)]
 
-    ax.scatter(X[notsv, 0], X[notsv, 1], c=y[notsv], cmap=cm_bright, s=30)
+    ax.scatter(X[notsvc1, 0], X[notsvc1, 1], color='blue', s=30, marker="o")
+    ax.scatter(X[notsvc2, 0], X[notsvc2, 1], c=y[notsvc2], cmap=cm_bright, s=30, marker="x")
     y[support_vectors] = 0
     ax.scatter(X[support_vectors, 0], X[support_vectors, 1], c='yellow', marker=">",s=40)
     plt.xlabel("X1")
     plt.ylabel("X2")
+    ax.set_xlim((X[:,0].min(), X[:,0].max()))
+    ax.set_ylim((X[:,1].min(), X[:,1].max()))
     return ax

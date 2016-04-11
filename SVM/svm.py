@@ -6,6 +6,8 @@ from sklearn import metrics
 from scipy.spatial.distance import pdist, squareform
 import scipy
 from sklearn import preprocessing, metrics
+from sklearn.cross_validation import KFold
+import metrics as svmmetrics
 
 def getDistanceGramMatrix(X):
     return squareform(pdist(X, 'euclidean'))
@@ -21,9 +23,9 @@ def getGramMatrix(X,type=None):
     if(type == None):
         return np.dot(X, X.T)
     elif (type == 'gaussian'):
-        return getGaussianGramMatrix(X,10)
+        return getGaussianGramMatrix(X,2)
     elif (type == 'polynomial'):
-        return getPolynomialGramMatrix(X, 2)
+        return getPolynomialGramMatrix(X, 4)
 
 def train(X,y,c=9999, eps=0.1, type=None):
     m = X.shape[0]
@@ -56,7 +58,7 @@ def train(X,y,c=9999, eps=0.1, type=None):
     b=matrix(b, tc='d')
 
     #solve for alphas
-    solvers.options['maxiters'] = 1000
+    # solvers.options['maxiters'] = 1000
     solution = solvers.qp(P, q, G, h, A, b)
     alphas = np.matrix(solution['x'])
 
@@ -77,7 +79,11 @@ def train(X,y,c=9999, eps=0.1, type=None):
 
     return w,w0, support_vectors_idx
 
-def classify(x,w,w0):
+def classify(x,w,w0, type=None):
+    # if(type == 'gaussian'):
+    #     sum = 0
+    #     for i in range(len(w)):
+    #         w[i]
     if(np.dot(w, x) + w0 > 0):
         return 1
     else:
@@ -91,3 +97,25 @@ def classify_all(X,w,w0):
 
 def getAccuracy(labels,predictedLabels):
     return metrics.accuracy_score(labels, predictedLabels)
+
+def kfoldCrossValidation(x,labels,k, positive_class, c, eps, type=None):
+    kf = KFold(len(x), n_folds=k)
+    all_metrics = list()
+    for train_index, test_index in kf:
+        x_train = x[train_index]
+        labels_train = labels[train_index]
+        x_test = x[test_index]
+        labels_test = labels[test_index]
+        w,w0,support_vectors_idx = train(x_train,labels_train, type=type)
+        predictedLabels = classify_all(x_test,w,w0)
+        accuracy = svmmetrics.getAccuracy(labels_test,predictedLabels, positive_class)
+        print(accuracy)
+        recall = svmmetrics.getRecall(labels_test,predictedLabels, positive_class)
+        precision = svmmetrics.getPrecision(labels_test,predictedLabels, positive_class)
+        tp = svmmetrics.getTP(labels_test,predictedLabels,positive_class)
+        tn = svmmetrics.getTN(labels_test,predictedLabels,positive_class)
+        fp = svmmetrics.getFP(labels_test,predictedLabels,positive_class)
+        fn = svmmetrics.getFN(labels_test,predictedLabels,positive_class)
+        fmeasure = svmmetrics.getFMeasure(labels_test,predictedLabels,positive_class)
+        all_metrics.append([accuracy,recall,precision,tp,tn,fp,fn,fmeasure])
+    return np.mean(all_metrics,axis=0)

@@ -21,19 +21,20 @@ def func(x):
 
 def func2(x):
     val = np.dot(x, [-2,-1])
-    if (abs(val - 0) < 3):
+    if (abs(val - 0) < 5):
         if(random.random() < 0.5):
             return trans_val(-1*val)
     return trans_val(val)
 
 def main():
-    m=100
+    m=150
+    random.seed(2)
     X = np.empty([m,2])
     X[:,0] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
     X[:,1] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
 
     #not separable
-    y = np.empty([100,1])
+    y = np.empty([m,1])
     for i in range(X.shape[0]):
         y[i] = func2(X[i,:])
 
@@ -45,7 +46,7 @@ def main():
 
     #train svm
     #change c to hard/soft margins
-    w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999,eps=4)
+    w,w0, support_vectors_idx = svm.train(X,y,c=9999999,eps=40)
 
     #plot result
     predicted_labels = svm.classify_all(X,w,w0)
