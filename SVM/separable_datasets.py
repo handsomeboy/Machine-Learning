@@ -58,19 +58,6 @@ def main():
     plt.show()
 
 
-    #not separable
-    # y = np.empty([100,1])
-    # for i in range(X.shape[0]):
-    #     y[i] = func2(X[i,:])
-    #
-    # # plot data and decision surface
-    # ax = plt.gca()
-    # cm_bright = ListedColormap(['#FF0000', '#0000FF'])
-    # ax.scatter(X[:,1], X[:,2], c=(y == 1), cmap=cm_bright)
-    # plt.xlabel("X1")
-    # plt.ylabel("X2")
-    # pu.plot_surface(X,y, X[:, 1], X[:, 2], disc_func=func, ax=ax)
-    # plt.show()
 
 if __name__ == "__main__":
     main()

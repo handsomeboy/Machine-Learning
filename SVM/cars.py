@@ -26,19 +26,19 @@ def main():
     y = y[p]
 
     #train svm
-    # w, w0, support_vectors_idx = svm.train(X, y, c=99, eps=0.00001)
+    w, w0, support_vectors_idx = svm.train(X, y, c=99, eps=0.00001)
 
     #get accuracy
-    # predicted_labels = svm.classify_all(X,w,w0)
-    # print("Accuracy: {}".format(svm.getAccuracy(y,predicted_labels)))
+    predicted_labels = svm.classify_all(X,w,w0)
+    print("Accuracy: {}".format(svm.getAccuracy(y,predicted_labels)))
     #
     # evaluate performance
-    # kfold = svm.kfoldCrossValidation(X, y, 10, 1, c=99, eps=0.00001)
-    # print (kfold)
+    kfold = svm.kfoldCrossValidation(X, y, 10, 1, c=99, eps=0.00001)
+    print (kfold)
 
     # evaluate performance with gaussina kernel function
-    # kfold = svm.kfoldCrossValidation(X, y, 10, 1, c=99, eps=0.00001, type='gaussian')
-    # print (kfold)
+    kfold = svm.kfoldCrossValidation(X, y, 10, 1, c=99, eps=0.00001, type='gaussian')
+    print (kfold)
 
     # evaluate performance with polynomial kernel function
     kfold = svm.kfoldCrossValidation(X, y, 10, 1, c=99, eps=0.00001, type='polynomial')

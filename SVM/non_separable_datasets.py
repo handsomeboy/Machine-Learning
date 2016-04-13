@@ -14,7 +14,7 @@ def trans_val(val):
         return -1
 
 def func(x):
-    if (np.dot(x, [-2,-1]) > 0):
+    if (np.dot(x, [-2,-1]) > 0) :
         return 1
     else :
         return -1
@@ -27,7 +27,7 @@ def func2(x):
     return trans_val(val)
 
 def main():
-    m=150
+    m=350
     random.seed(2)
     X = np.empty([m,2])
     X[:,0] = np.matrix((random.sample(range(-10000, 10000), m))) / float(1000)
@@ -46,7 +46,7 @@ def main():
 
     #train svm
     #change c to hard/soft margins
-    w,w0, support_vectors_idx = svm.train(X,y,c=9999999,eps=40)
+    w,w0, support_vectors_idx = svm.train(X,y,c=99999,eps=0.1)
 
     #plot result
     predicted_labels = svm.classify_all(X,w,w0)
@@ -57,16 +57,6 @@ def main():
     pu.plot_surfaceSVM(X[:,0], X[:,1], w,w0, ax=ax)
     plt.show()
 
-
-
-    # # plot data and decision surface
-    # ax = plt.gca()
-    # cm_bright = ListedColormap(['#FF0000', '#0000FF'])
-    # ax.scatter(X[:,1], X[:,2], c=(y == 1), cmap=cm_bright)
-    # plt.xlabel("X1")
-    # plt.ylabel("X2")
-    # pu.plot_surface(X,y, X[:, 1], X[:, 2], disc_func=func, ax=ax)
-    # plt.show()
 
 if __name__ == "__main__":
     main()

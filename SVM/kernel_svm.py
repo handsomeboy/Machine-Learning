@@ -37,8 +37,8 @@ def main():
 
     #train svm
 
-    #w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999, eps=10, type='gaussian')
-    w, w0, support_vectors_idx = svm.train(X, y, c=999999999999999, eps=10, type='polynomial')
+    w,w0, support_vectors_idx = svm.train(X,y,c=999999999999999, eps=10, type='gaussian')
+    # w, w0, support_vectors_idx = svm.train(X, y, c=999999999999999, eps=10, type='polynomial')
     #plot result
     predicted_labels = svm.classify_all(X,w,w0)
     print("Accuracy: {}".format(svm.getAccuracy(y,predicted_labels)))
